@@ -1,4 +1,4 @@
-package utils
+package toolbox
 
 import (
 	"go.uber.org/zap"

@@ -1,4 +1,4 @@
-package jwt
+package toolbox
 
 import (
 	"errors"
@@ -8,8 +8,16 @@ import (
 	"time"
 )
 
+// 爬虫工具
+type jwtUtils struct {
+}
+
+func (u *utils) NewJwtUtils() *jwtUtils {
+	return &jwtUtils{}
+}
+
 // JWTAuth 中间件，检查token
-func JWTAuth() gin.HandlerFunc {
+func (j *jwtUtils) JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorize")
 		if token == "" {
@@ -18,9 +26,9 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		j := NewJWT()
+		p := j.NewJWT()
 		// parseToken 解析token包含的信息
-		claims, err := j.ParseToken(token)
+		claims, err := p.ParseToken(token)
 		if err != nil {
 			if err == TokenExpired {
 				response.NewResponse().AuthorizeJson(c, "授权已过期")
@@ -57,19 +65,19 @@ type CustomClaims struct {
 }
 
 // 新建一个jwt实例
-func NewJWT() *JWT {
+func (j *jwtUtils) NewJWT() *JWT {
 	return &JWT{
-		[]byte(GetSignKey()),
+		[]byte(j.GetSignKey()),
 	}
 }
 
 // 获取signKey
-func GetSignKey() string {
+func (j *jwtUtils) GetSignKey() string {
 	return SignKey
 }
 
 // 这是SignKey
-func SetSignKey(key string) string {
+func (j *jwtUtils) SetSignKey(key string) string {
 	SignKey = key
 	return SignKey
 }

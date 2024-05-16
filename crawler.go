@@ -1,4 +1,4 @@
-package utils
+package toolbox
 
 import (
 	"github.com/gocolly/colly"
