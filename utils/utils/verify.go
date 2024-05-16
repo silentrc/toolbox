@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
 	"regexp"
@@ -34,6 +35,9 @@ func (v *verifyUtils) VerifyEmailFormat(email string) bool {
 
 // 绑定请求数据
 func (v *verifyUtils) BindRequest(c *gin.Context, value interface{}) (err error) {
+	if value == nil {
+		return errors.New("value is nil")
+	}
 	err = c.ShouldBind(value)
 	if err == nil && value != nil {
 		return
