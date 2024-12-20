@@ -20,6 +20,11 @@ func (ti *timesUtils) NowTime() time.Time {
 	return nowTime
 }
 
+func (ti *timesUtils) NowTimeString() string {
+	nowTimeFormat := time.Now().Format("2006-01-02 15:04:05")
+	return nowTimeFormat
+}
+
 // 转换时间格式
 func (ti *timesUtils) FormatTimeString(t string) (time.Time, error) {
 	const Layout = "2006-01-02 15:04:05" //时间常量
