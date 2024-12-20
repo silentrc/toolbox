@@ -10,10 +10,13 @@ import (
 
 // 爬虫工具
 type jwtUtils struct {
+	SignKey string
 }
 
-func (u *utils) NewJwtUtils() *jwtUtils {
-	return &jwtUtils{}
+func (u *utils) NewJwtUtils(signKey string) *jwtUtils {
+	return &jwtUtils{
+		SignKey: signKey,
+	}
 }
 
 // JWTAuth 中间件，检查token
@@ -51,11 +54,10 @@ type JWT struct {
 
 // 一些常量
 var (
-	TokenExpired     error  = errors.New("token过期")
-	TokenNotValidYet error  = errors.New("token未激活啊")
-	TokenMalformed   error  = errors.New("错误的token")
-	TokenInvalid     error  = errors.New("无法处理此token")
-	SignKey          string = "productCenter"
+	TokenExpired     error = errors.New("token过期")
+	TokenNotValidYet error = errors.New("token未激活啊")
+	TokenMalformed   error = errors.New("错误的token")
+	TokenInvalid     error = errors.New("无法处理此token")
 )
 
 type CustomClaims struct {
@@ -73,13 +75,13 @@ func (j *jwtUtils) NewJWT() *JWT {
 
 // 获取signKey
 func (j *jwtUtils) GetSignKey() string {
-	return SignKey
+	return j.SignKey
 }
 
 // 这是SignKey
 func (j *jwtUtils) SetSignKey(key string) string {
-	SignKey = key
-	return SignKey
+	j.SignKey = key
+	return j.SignKey
 }
 
 // CreateToken 生成一个token
