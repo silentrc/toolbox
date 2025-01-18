@@ -87,5 +87,17 @@ func (b *Value) ToString() string {
 	return ""
 }
 
+func (b *Value) ToInt64() (int64, error) {
+	if b.s != nil {
+		intI, err := strconv.Atoi(*b.s)
+		if err != nil {
+			return 0, err
+		}
+		return int64(intI), nil
+	} else {
+		return *b.i, nil
+	}
+}
+
 var _ json.Unmarshaler = &Value{}
 var _ json.Marshaler = &Value{}
