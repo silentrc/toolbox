@@ -9,7 +9,7 @@ type timesUtils struct {
 }
 
 // 时间类
-func (us *utils) NewTimesUtils() *timesUtils {
+func (u *utils) NewTimesUtils() *timesUtils {
 	return &timesUtils{}
 }
 

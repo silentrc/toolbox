@@ -27,7 +27,7 @@ func NewIPv6(filePath string) (d *Dat, err error) {
 
 	// 4~5 版本号, 现在是2。版本号0x01到0xFF之间保证互相兼容
 	if d.Version = binary.LittleEndian.Uint16(d.Data[4:6]); d.Version > 2 {
-		return nil, errors.New("文件版本错误:" + err.Error())
+		return nil, errors.New("文件版本错误")
 	}
 
 	// 6 byte 偏移地址长度(2~8)  3

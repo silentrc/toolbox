@@ -3,15 +3,15 @@ package toolbox
 import (
 	"fmt"
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
-	"io"
+	"github.com/silentrc/toolbox/ipv6"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 )
 
-var SearchIP *xdb.Searcher
+var ipv4Search *xdb.Searcher
+var ipv6Search *ipv6.Dat
 
 type ipUtils struct {
 }
@@ -20,29 +20,51 @@ func (u *utils) NewIP() *ipUtils {
 	return &ipUtils{}
 }
 
-func (i *ipUtils) Init() {
-	var dbPath = "./conf/data/ip2region.xdb"
-	f, err := os.Open(dbPath)
+func (i *ipUtils) Init(ipv4Path, ipv6Path string) {
+	vIndex, err := xdb.LoadVectorIndexFromFile(ipv4Path)
 	if err != nil {
-		fmt.Printf("read file to load content from `%s`: %s\n", dbPath, err)
+		fmt.Printf("failed to load vector index from `%s`: %s\n", ipv4Path, err)
 		return
 	}
-	// 1、从 dbPath 加载整个 xdb 到内存
-	//cBuff, err := LoadContentFromFile(dbPath)
-	cBuff, err := io.ReadAll(f)
+	searcher, err := xdb.NewWithVectorIndex(ipv4Path, vIndex)
 	if err != nil {
-		fmt.Printf("read file to load content from `%s`: %s\n", dbPath, err)
+		fmt.Printf("failed to create searcher with vector index: %s\n", err)
 		return
 	}
+	ipv4Search = searcher
+	ipv6Client, err := ipv6.NewIPv6(ipv6Path)
+	if err != nil {
+		fmt.Printf(" ipv6.NewIPv6 err: %s\n", err)
+		return
+	}
+	ipv6Search = ipv6Client
+}
 
-	// 2、用全局的 cBuff 创建完全基于内存的查询对象。
-	searcher, err := xdb.NewWithBuffer(cBuff)
-	if err != nil {
-		fmt.Printf("failed to create searcher with content: %s\n", err)
-		return
+func (i *ipUtils) Search(ip string) string {
+	switch i.IPv4orIPv6(ip) {
+	case 4:
+		str, err := ipv4Search.SearchByStr(ip)
+		if err != nil {
+			return "无法解析"
+		}
+		return str
+	case 6:
+		res := ipv6Search.Find(ip)
+		return fmt.Sprintf("%v-%v", res.Country, res.Area)
+	default:
+		return "非法地址"
 	}
-	defer f.Close()
-	SearchIP = searcher
+}
+
+func (i *ipUtils) IPv4orIPv6(ip string) int {
+	res := net.ParseIP(ip)
+	if res != nil && strings.Contains(ip, ".") {
+		return 4
+	}
+	if res != nil && strings.Contains(ip, ":") {
+		return 6
+	}
+	return 0
 }
 
 // ClientPublicIP 尽最大努力实现获取客户端公网 IP 的算法。
@@ -66,7 +88,6 @@ func ClientPublicIP(r *http.Request) string {
 			return ip
 		}
 	}
-
 	return ""
 }
 
@@ -100,7 +121,7 @@ func (h *httpUtils) GetRealIP(r *http.Request) string {
 	return ip
 }
 
-// ClientIP 尽最大努力实现获取客户端 IP 的算法。
+// ClientIp 尽最大努力实现获取客户端 IP 的算法。
 // 解析 X-Real-IP 和 X-Forwarded-For 以便于反向代理（nginx 或 haproxy）可以正常工作。
 func ClientIp(r *http.Request) string {
 	xForwardedFor := r.Header.Get("X-Forwarded-For")

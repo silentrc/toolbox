@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/silentrc/toolbox/common/response"
+	"net/http"
 	"time"
 )
 
@@ -24,7 +24,10 @@ func (j *jwtUtils) JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorize")
 		if token == "" {
-			response.NewResponse().AuthorizeJson(c, "请求未携带Authorize，无权限访问")
+			c.JSON(http.StatusOK, gin.H{
+				"code": http.StatusUnauthorized,
+				"msg":  "请求未携带Authorize，无权限访问",
+			})
 			c.Abort()
 			return
 		}
@@ -34,11 +37,17 @@ func (j *jwtUtils) JWTAuth() gin.HandlerFunc {
 		claims, err := p.ParseToken(token)
 		if err != nil {
 			if err == TokenExpired {
-				response.NewResponse().AuthorizeJson(c, "授权已过期")
+				c.JSON(http.StatusOK, gin.H{
+					"code": http.StatusUnauthorized,
+					"msg":  "请求未携带Authorize，无权限访问",
+				})
 				c.Abort()
 				return
 			}
-			response.NewResponse().AuthorizeJson(c, err.Error())
+			c.JSON(http.StatusOK, gin.H{
+				"code": http.StatusInternalServerError,
+				"msg":  "解析Authorize错误",
+			})
 			c.Abort()
 			return
 		}

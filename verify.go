@@ -11,14 +11,14 @@ import (
 type verifyUtils struct {
 }
 
-// 校验类
+// NewVerifyUtils 校验类
 func (u *utils) NewVerifyUtils() *verifyUtils {
 	return &verifyUtils{}
 }
 
 // phone verify
 func (v *verifyUtils) VerifyMobileFormat(mobileNum string) bool {
-	regular := "^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$"
+	regular := "^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|192|193|198|199|(147))\\d{8}$"
 
 	reg := regexp.MustCompile(regular)
 	return reg.MatchString(mobileNum)
@@ -39,15 +39,15 @@ func (v *verifyUtils) BindRequest(c *gin.Context, value interface{}) (err error)
 		return errors.New("value is nil")
 	}
 	err = c.ShouldBind(value)
-	if err == nil && value != nil {
+	if err == nil {
 		return
 	}
 	err = c.ShouldBindJSON(value)
-	if err == nil && value != nil {
+	if err == nil {
 		return
 	}
 	err = c.ShouldBindQuery(value)
-	if err == nil && value != nil {
+	if err == nil {
 		return
 	}
 	body, err := io.ReadAll(c.Request.Body)
