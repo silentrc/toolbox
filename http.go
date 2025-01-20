@@ -15,10 +15,12 @@ func (u *utils) NewHttpUtils() *httpUtils {
 	return &httpUtils{}
 }
 
-func (h *httpUtils) Client() (resp *resty.Request) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+func (h *httpUtils) Client(skipVerify bool) (resp *resty.Request) {
+	tr := &http.Transport{}
+	if skipVerify {
+		tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
+
 	cli := &http.Client{
 		Transport: tr,
 	}
@@ -26,9 +28,10 @@ func (h *httpUtils) Client() (resp *resty.Request) {
 	return
 }
 
-func (h *httpUtils) ProxyClient(proxyUrl string) (resp *resty.Request) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+func (h *httpUtils) ProxyClient(proxyUrl string, skipVerify bool) (resp *resty.Request) {
+	tr := &http.Transport{}
+	if skipVerify {
+		tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 	uri, err := url.Parse(proxyUrl)
 	if err == nil {

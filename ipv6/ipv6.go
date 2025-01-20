@@ -164,9 +164,10 @@ func (d *Dat) GetUint64(offset, size uint64) uint64 {
 
 func byte2UInt64(data []byte) uint64 {
 	var i = []byte{0, 0, 0, 0, 0, 0, 0, 0}
-	for j := 0; j < len(data); j++ {
-		i[j] = data[j]
-	}
-
+	copy(i, data)
+	//for j := 0; j < len(data); j++ {
+	//	i[j] = data[j]
+	//}
+	//
 	return binary.LittleEndian.Uint64(i)
 }

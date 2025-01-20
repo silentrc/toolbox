@@ -1,14 +1,15 @@
 package toolbox
 
 import (
-	"go.uber.org/zap"
+	"fmt"
 	"runtime/debug"
 )
 
 // Recover 出错打印错误堆栈
 func Recover() {
 	if err := recover(); err != nil {
-		zap.L().Sugar().Errorf("Panic: %v\n%s", err, string(debug.Stack()))
+		fmt.Printf("Panic: %v\n%s", err, string(debug.Stack()))
+		return
 	}
 }
 
@@ -31,13 +32,12 @@ func GoWithRecover(handler func(), recoverHandler func(r interface{})) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				// log
-				zap.L().Sugar().Errorf("goroutine panic: %v\n%s", r, string(debug.Stack()))
+				fmt.Printf("goroutine panic: %v\n%s", r, string(debug.Stack()))
 				if recoverHandler != nil {
 					go func() {
 						defer func() {
 							if p := recover(); p != nil {
-								zap.L().Sugar().Errorf("goroutine panic: %v\n%s", p, string(debug.Stack()))
+								fmt.Printf("goroutine panic: %v\n%s", r, string(debug.Stack()))
 							}
 						}()
 						recoverHandler(r)

@@ -87,7 +87,9 @@ func (f *filesUtils) DownloadFileProgress(fileHash, fileUrl, localPath string, c
 	}()
 	//获取文件总大小
 	fs, err := strconv.ParseUint(resp.Header.Get("Content-Length"), 10, 32)
-
+	if err != nil {
+		return err
+	}
 	//opts := &ioWriter{
 	//	callback: callback,
 	//	progress: progress{

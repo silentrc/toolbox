@@ -36,7 +36,7 @@ func (j *jwtUtils) JWTAuth() gin.HandlerFunc {
 		// parseToken 解析token包含的信息
 		claims, err := p.ParseToken(token)
 		if err != nil {
-			if err == TokenExpired {
+			if err == ErrTokenExpired {
 				c.JSON(http.StatusOK, gin.H{
 					"code": http.StatusUnauthorized,
 					"msg":  "请求未携带Authorize，无权限访问",
@@ -63,10 +63,10 @@ type JWT struct {
 
 // 一些常量
 var (
-	TokenExpired     error = errors.New("token过期")
-	TokenNotValidYet error = errors.New("token未激活啊")
-	TokenMalformed   error = errors.New("错误的token")
-	TokenInvalid     error = errors.New("无法处理此token")
+	ErrTokenExpired     = errors.New("token过期")
+	ErrTokenNotValidYet = errors.New("token未激活啊")
+	ErrTokenMalformed   = errors.New("错误的token")
+	ErrTokenInvalid     = errors.New("无法处理此token")
 )
 
 type CustomClaims struct {
@@ -107,21 +107,19 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 	})
 	if err != nil {
 		if err == jwt.ErrTokenMalformed {
-			return nil, TokenMalformed
+			return nil, ErrTokenMalformed
 		} else if err == jwt.ErrTokenExpired {
-			return nil, TokenExpired
+			return nil, ErrTokenExpired
 		} else if err == jwt.ErrTokenNotValidYet {
-			return nil, TokenNotValidYet
-		} else if err == jwt.ErrTokenExpired {
-			return nil, TokenExpired
+			return nil, ErrTokenNotValidYet
 		} else {
-			return nil, TokenInvalid
+			return nil, ErrTokenInvalid
 		}
 	}
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, TokenInvalid
+	return nil, ErrTokenInvalid
 }
 
 // 更新token
@@ -136,5 +134,5 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 		claims.RegisteredClaims.ExpiresAt.Time = time.Now().Add(1 * time.Hour)
 		return j.CreateToken(*claims)
 	}
-	return "", TokenInvalid
+	return "", ErrTokenInvalid
 }
