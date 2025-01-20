@@ -58,7 +58,6 @@ func (i *ipUtils) Search(ip string) string {
 
 func (i *ipUtils) IPv4orIPv6(ip string) int {
 	res := net.ParseIP(ip)
-
 	if res.To4() != nil {
 		return 4
 	}
