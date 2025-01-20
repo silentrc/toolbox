@@ -58,13 +58,11 @@ func (i *ipUtils) Search(ip string) string {
 
 func (i *ipUtils) IPv4orIPv6(ip string) int {
 	res := net.ParseIP(ip)
-	if res != nil && strings.Contains(ip, ".") {
+
+	if res.To4() != nil {
 		return 4
 	}
-	if res != nil && strings.Contains(ip, ":") {
-		return 6
-	}
-	return 0
+	return 6
 }
 
 // ClientPublicIP 尽最大努力实现获取客户端公网 IP 的算法。
