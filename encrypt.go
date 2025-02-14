@@ -5,8 +5,10 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/des"
+	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
@@ -36,6 +38,29 @@ func (g *encrypt) Sha1(str string) string {
 	s := sha1.New()
 	s.Write([]byte(str))
 	return hex.EncodeToString(s.Sum(nil))
+}
+
+func (g *encrypt) Sha256(str string) string {
+	s := sha256.New()
+	s.Write([]byte(str))
+	return hex.EncodeToString(s.Sum(nil))
+}
+
+func (g *encrypt) HmacSha256(key string, data string) []byte {
+	mac := hmac.New(sha256.New, []byte(key))
+	_, _ = mac.Write([]byte(data))
+
+	return mac.Sum(nil)
+}
+
+// HmacSha256ToHex 将加密后的二进制转16进制字符串
+func (g *encrypt) HmacSha256ToHex(key string, data string) string {
+	return hex.EncodeToString(g.HmacSha256(key, data))
+}
+
+// HmacSha256ToHex 将加密后的二进制转Base64字符串
+func (g *encrypt) HmacSha256ToBase64(key string, data string) string {
+	return base64.URLEncoding.EncodeToString(g.HmacSha256(key, data))
 }
 
 func (g *encrypt) EncodePwd(str string) string {
