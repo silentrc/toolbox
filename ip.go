@@ -2,12 +2,13 @@ package toolbox
 
 import (
 	"fmt"
-	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
-	"github.com/silentrc/toolbox/ipv6"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
+	"github.com/silentrc/toolbox/ipv6"
 )
 
 var ipv4Search *xdb.Searcher
@@ -26,7 +27,8 @@ func (i *ipUtils) Init(ipv4Path, ipv6Path string) {
 		fmt.Printf("failed to load vector index from `%s`: %s\n", ipv4Path, err)
 		return
 	}
-	searcher, err := xdb.NewWithVectorIndex(ipv4Path, vIndex)
+	version := xdb.IPv4
+	searcher, err := xdb.NewWithVectorIndex(version, ipv4Path, vIndex)
 	if err != nil {
 		fmt.Printf("failed to create searcher with vector index: %s\n", err)
 		return

@@ -7,7 +7,7 @@ require (
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/gocolly/colly v1.2.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
+	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20251231140407-f302c68012c5
 	golang.org/x/text v0.32.0
 )
 
